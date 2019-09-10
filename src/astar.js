@@ -5,7 +5,7 @@ var Agent = require("./models/Agent");
 const [x, y, result] = FileReader.init(process.argv[2]);
 
 let grid = new Grid(x, y, result);
-let agent = new Agent(grid.start.x, grid.start.y);
+let agent = new Agent(grid.start.x, grid.start.y, result);
 console.log("[START]", agent);
 while (grid.end.x !== agent.currentX || grid.end.y !== agent.currentY) {
   agent.executeMove(grid.map, grid.xSize, grid.ySize);

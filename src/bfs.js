@@ -5,7 +5,7 @@ var Queue = require("./models/Queue");
 const [x, y, result] = FileReader.init(process.argv[2]);
 
 let grid = new Grid(x, y, result);
-let agent = new Agent(grid.start.x, grid.start.y);
+let agent = new Agent(grid.start.x, grid.start.y, result);
 
 console.log("[START]", agent);
 

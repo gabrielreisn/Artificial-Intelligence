@@ -1,13 +1,19 @@
+const FACE = require("./utils");
 function gridRespectsBoundaries(sizeX, sizeY, posX, posY) {
   if (posX < 0 || posY < 0) return false;
   if (posX >= sizeX || posY >= sizeY) return false;
   return true;
 }
 
+function initialFace(x, y, grid) {
+  return grid[x][y] === ">" ? FACE.LESTE : FACE.OESTE;
+}
+
 module.exports = class Agent {
-  constructor(startX, startY) {
+  constructor(startX, startY, rawGrid) {
     this.currentX = startX;
     this.currentY = startY;
+    this.face = initialFace(startX, startY, rawGrid);
     this.count = 0;
     this.steps = [];
   }
@@ -19,14 +25,34 @@ module.exports = class Agent {
   executeMove(grid, gridSizeX, gridSizeY) {
     const neighbors = this.findNeighbors(grid, gridSizeX, gridSizeY);
     const near = this.findNearestNeighbor(neighbors);
-    this.move(near.x, near.y);
+
+    const nface = this.findNeighborFace(near.x, near.y);
+
+    this.alignElements(nface);
+
+    this.move(near.x, near.y, nface);
   }
 
-  move(newX, newY) {
+  alignElements(nface) {
+    if (nface !== this.face) {
+      const horario = this.shouldRotateH(nface);
+      while (nface !== this.face) {
+        if (horario) {
+          this.moveHorario();
+        } else {
+          this.moveAntiHorario();
+        }
+        this.move(this.currentX, this.currentY, this.face);
+      }
+    }
+  }
+
+  move(newX, newY, face = null) {
     this.count++;
-    this.steps.push({ x: this.currentX, y: this.currentY });
+    this.steps.push({ x: this.currentX, y: this.currentY, face });
     this.currentX = newX;
     this.currentY = newY;
+    this.face = face;
   }
 
   calculateDistance(target) {
@@ -72,4 +98,105 @@ module.exports = class Agent {
 
     return near;
   }
+
+  shouldRotateH(neighborFace) {
+    const originalFace = this.face;
+    let clockCount = 0;
+    let counterCount = 0;
+    while (neighborFace !== this.face) {
+      this.moveHorario();
+      clockCount++;
+    }
+
+    this.face = originalFace;
+
+    while (neighborFace !== this.face) {
+      this.moveAntiHorario();
+      counterCount++;
+    }
+
+    this.face = originalFace;
+
+    return clockCount < counterCount ? true : false;
+  }
+
+  moveAntiHorario() {
+    switch (this.face) {
+      case FACE.NORTE:
+        this.face = FACE.NOROESTE;
+        break;
+      case FACE.NORDESTE:
+        this.face = FACE.NORTE;
+        break;
+      case FACE.LESTE:
+        this.face = FACE.NORDESTE;
+        break;
+      case FACE.SUDESTE:
+        this.face = FACE.LESTE;
+        break;
+      case FACE.SUL:
+        this.face = FACE.SUDESTE;
+        break;
+      case FACE.SUDOESTE:
+        this.face = FACE.SUL;
+        break;
+      case FACE.OESTE:
+        this.face = FACE.SUDOESTE;
+        break;
+      case FACE.NOROESTE:
+        this.face = FACE.OESTE;
+        break;
+    }
+  }
+
+  moveHorario() {
+    switch (this.face) {
+      case FACE.NORTE:
+        this.face = FACE.NORDESTE;
+        break;
+      case FACE.NORDESTE:
+        this.face = FACE.LESTE;
+        break;
+      case FACE.LESTE:
+        this.face = FACE.SUDESTE;
+        break;
+      case FACE.SUDESTE:
+        this.face = FACE.SUL;
+        break;
+      case FACE.SUL:
+        this.face = FACE.SUDOESTE;
+        break;
+      case FACE.SUDOESTE:
+        this.face = FACE.OESTE;
+        break;
+      case FACE.OESTE:
+        this.face = FACE.NOROESTE;
+        break;
+      case FACE.NOROESTE:
+        this.face = FACE.NORTE;
+        break;
+    }
+  }
+
+  findNeighborFace(nx, ny) {
+    const difx = nx - this.currentX;
+    const dify = ny - this.currentY;
+
+    if (difx === -1 && dify === -1) return FACE.NOROESTE;
+    if (difx === 0 && dify === -1) return FACE.NORTE;
+    if (difx === 1 && dify === -1) return FACE.NORDESTE;
+
+    if (difx === -1 && dify === 0) return FACE.OESTE;
+    if (difx === 1 && dify === 0) return FACE.LESTE;
+
+    if (difx === -1 && dify === 1) return FACE.SUDOESTE;
+    if (difx === 0 && dify === 1) return FACE.SUL;
+    if (difx === 1 && dify === 1) return FACE.SUDESTE;
+  }
 };
+
+// ^ = 11
+
+// 00 01 02
+// 10 ^^ 12
+// 20 21 22
