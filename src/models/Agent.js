@@ -6,7 +6,11 @@ function gridRespectsBoundaries(sizeX, sizeY, posX, posY) {
 }
 
 function initialFace(x, y, grid) {
-  return grid[x][y] === ">" ? FACE.LESTE : FACE.OESTE;
+  const gridContent = grid[x][y];
+  if (gridContent === ">") return FACE.LESTE;
+  if (gridContent === "<") return FACE.OESTE;
+  if (gridContent === "^") return FACE.NORTE;
+  return FACE.SUL;
 }
 
 module.exports = class Agent {
@@ -194,9 +198,3 @@ module.exports = class Agent {
     if (difx === 1 && dify === 1) return FACE.SUDESTE;
   }
 };
-
-// ^ = 11
-
-// 00 01 02
-// 10 ^^ 12
-// 20 21 22

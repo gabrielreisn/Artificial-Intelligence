@@ -2,6 +2,22 @@
 
 Repository used for UTFPR classes (sistemas inteligentes) containing A-\* (A-start) and BFS (Breadth-first search) algorithms
 
+# Representing symbols
+
+The algorithm uses a file for representing the maze, the file should content the following rules:
+
+- First Line: a single integer, representing the number of rows(n_rows) of the environment;
+- Second Line: a single integer, representing the number of columns(n_cols) of the environment;
+- A sequence of 'n_rows' lines, each with 'n_cols' symbols from:
+  - Character '.' representing free positions in the grid;
+  - Character '\*' representing positions in the grid with obstacles;
+  - Character 'x' representing the 'goal' position of the 'robot';
+    - One of the following characters, representing the robot's initial position and orientation:
+      - Character '>' if the robot is facing EAST [ LESTE ];
+      - Character '^' if the robot is facing NORTH [ NORTE ];
+      - Character '<' if the robot is facing WEST [ OESTE ];
+      - Character 'v' if the robot is facing SOUTH [ SUL ];
+
 # Running the project
 
 #### 1- Make sure you have at least Node.js version 8.11+ (test running: `node -v`)

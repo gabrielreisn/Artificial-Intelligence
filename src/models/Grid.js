@@ -10,7 +10,7 @@ module.exports = class Grid {
   constructor(x, y, rawMap) {
     this.xSize = x;
     this.ySize = y;
-    this.start = this.findPoint(rawMap, ">");
+    this.start = this.findStartPoint(rawMap);
     this.end = this.findPoint(rawMap, "x");
     this.map = this.fillGrid(this.xSize, this.ySize, rawMap);
   }
@@ -40,5 +40,16 @@ module.exports = class Grid {
       }
     });
     return { x, y };
+  }
+
+  findStartPoint(map) {
+    let localX = undefined;
+    let localY = undefined;
+    const symb = [">", "<", "v", "^"].filter(el => {
+      const point = this.findPoint(map, el);
+      return point.x !== undefined && point.y !== undefined;
+    });
+
+    return this.findPoint(map, symb[0]);
   }
 };
