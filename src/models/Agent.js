@@ -13,6 +13,20 @@ function initialFace(x, y, grid) {
   return FACE.SUL;
 }
 
+function isDiagonalMove(face) {
+  switch (face) {
+    case FACE.NORDESTE:
+    case FACE.NOROESTE:
+    case FACE.SUDESTE:
+    case FACE.SUDOESTE:
+      return true;
+      break;
+    default:
+      return false;
+      break;
+  }
+}
+
 module.exports = class Agent {
   constructor(startX, startY, rawGrid) {
     this.currentX = startX;
@@ -52,7 +66,11 @@ module.exports = class Agent {
   }
 
   move(newX, newY, face = null) {
-    this.count++;
+    if (isDiagonalMove(face) && face === this.face) {
+      this.count = this.count + 1.5;
+    } else {
+      this.count++;
+    }
     this.steps.push({ x: this.currentX, y: this.currentY, face });
     this.currentX = newX;
     this.currentY = newY;
